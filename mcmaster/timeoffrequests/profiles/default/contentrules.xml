@@ -1,0 +1,284 @@
+<?xml version="1.0"?>
+<contentrules>
+ <rule name="rule-1" title="Notify person when account is ready"
+    description="" enabled="True"
+    event="zope.lifecycleevent.interfaces.IObjectAddedEvent"
+    stop-after="False">
+  <conditions>
+   <condition type="plone.conditions.PortalType">
+    <property name="check_types">
+     <element>FSDPerson</element>
+    </property>
+   </condition>
+  </conditions>
+  <actions/>
+ </rule>
+ <rule name="--workflowmanager--approve"
+    title="approve transition content rule"
+    description="This content rule was automatically createdthe workflow manager to create actions on workflow events. If you want the behavior to work as expected, do not modify this out of the workflow manager."
+    enabled="True" event="Products.CMFCore.interfaces.IActionSucceededEvent"
+    stop-after="False">
+  <conditions>
+   <condition type="plone.conditions.WorkflowTransition">
+    <property name="wf_transitions">
+     <element>approve</element>
+    </property>
+   </condition>
+  </conditions>
+  <actions>
+   <action type="plone.actions.Mail">
+    <property name="source"/>
+    <property name="message">Hi,
+     
+     Your request at:
+     
+       ${url}
+     
+     has been approved.
+     
+     Sincerely,
+     
+     DFM Human Resources</property>
+    <property name="subject">Your request has been approved</property>
+    <property name="recipients">${owner_emails}</property>
+    <property name="exclude_actor">True</property>
+   </action>
+  </actions>
+ </rule>
+ <rule name="rule-2" title="Move time-off request" description=""
+    enabled="True" event="zope.lifecycleevent.interfaces.IObjectAddedEvent"
+    stop-after="False">
+  <conditions>
+   <condition type="plone.conditions.PortalType">
+    <property name="check_types">
+     <element>overtimepayout</element>
+     <element>overtimetime</element>
+     <element>timeoffrequest</element>
+    </property>
+   </condition>
+  </conditions>
+  <actions>
+   <action type="sc.contentrules.movebyattribute.MoveByAttribute">
+    <property name="attribute">department</property>
+    <property
+       name="base_folder">/mip-vacation-time-off-form/requests</property>
+   </action>
+  </actions>
+ </rule>
+ <rule name="--workflowmanager--cancel" title="cancel transition content rule"
+    description="This content rule was automatically createdthe workflow manager to create actions on workflow events. If you want the behavior to work as expected, do not modify this out of the workflow manager."
+    enabled="True" event="Products.CMFCore.interfaces.IActionSucceededEvent"
+    stop-after="False">
+  <conditions>
+   <condition type="plone.conditions.WorkflowTransition">
+    <property name="wf_transitions">
+     <element>cancel</element>
+    </property>
+   </condition>
+  </conditions>
+  <actions>
+   <action type="plone.actions.Mail">
+    <property name="source"/>
+    <property name="message">Hi,
+     
+     The overtime approval request at:
+     
+       ${url}
+     
+     has been cancelled.
+     
+     Sincerely,
+     
+     DFM Human Resources</property>
+    <property name="subject">Request has been cancelled</property>
+    <property name="recipients">${reviewer_emails}</property>
+    <property name="exclude_actor">True</property>
+   </action>
+  </actions>
+ </rule>
+ <rule name="--workflowmanager--reject" title="reject transition content rule"
+    description="This content rule was automatically createdthe workflow manager to create actions on workflow events. If you want the behavior to work as expected, do not modify this out of the workflow manager."
+    enabled="True" event="Products.CMFCore.interfaces.IActionSucceededEvent"
+    stop-after="False">
+  <conditions>
+   <condition type="plone.conditions.WorkflowTransition">
+    <property name="wf_transitions">
+     <element>reject</element>
+    </property>
+   </condition>
+  </conditions>
+  <actions>
+   <action type="plone.actions.Mail">
+    <property name="source"/>
+    <property name="message">Hi,
+     
+     Your request at:
+     
+       ${url}
+     
+     has been sent back for review with the comment:
+     
+       ${change_comment}
+     
+     Sincerely,
+     
+     DFM Human Resources</property>
+    <property name="subject">A request has been sent back</property>
+    <property name="recipients">${owner_emails}</property>
+    <property name="exclude_actor">True</property>
+   </action>
+  </actions>
+ </rule>
+ <rule name="--workflowmanager--retract"
+    title="retract transition content rule"
+    description="This content rule was automatically created by the workflow manager to create actions on workflow events. If you want the behavior to work as expected, do not modify this out of the workflow manager."
+    enabled="True" event="Products.CMFCore.interfaces.IActionSucceededEvent"
+    stop-after="False">
+  <conditions>
+   <condition type="plone.conditions.WorkflowTransition">
+    <property name="wf_transitions">
+     <element>retract</element>
+    </property>
+   </condition>
+  </conditions>
+  <actions>
+   <action type="plone.actions.Mail">
+    <property name="source"/>
+    <property name="message">Hi,
+     
+     The request at:
+     
+       ${url}
+     
+     has been retracted by the requester.
+     
+     Sincerely,
+     
+     DFM Human Resources</property>
+    <property name="subject">Requester retracted submission</property>
+    <property name="recipients">${reviewer_emails}</property>
+    <property name="exclude_actor">True</property>
+   </action>
+  </actions>
+ </rule>
+ <rule name="--workflowmanager--submit_to_supervisor"
+    title="submit_to_supervisor transition content rule"
+    description="This content rule was automatically createdthe workflow manager to create actions on workflow events. If you want the behavior to work as expected, do not modify this out of the workflow manager."
+    enabled="True" event="Products.CMFCore.interfaces.IActionSucceededEvent"
+    stop-after="False">
+  <conditions>
+   <condition type="plone.conditions.WorkflowTransition">
+    <property name="wf_transitions">
+     <element>submit_to_supervisor</element>
+    </property>
+   </condition>
+  </conditions>
+  <actions>
+   <action type="plone.actions.MailRole">
+    <property name="source"/>
+    <property name="role">Supervisor</property>
+    <property name="global_roles">False</property>
+    <property name="acquired">True</property>
+    <property name="message">Hi,
+     
+     A request is ready for review at:
+     
+       ${url}
+     
+     
+     Sincerely,
+     
+     DFM Human Resources</property>
+    <property name="subject">A request is ready for your review</property>
+   </action>
+  </actions>
+ </rule>
+ <rule name="--workflowmanager--submit_to_hr"
+    title="submit_to_hr transition content rule"
+    description="This content rule was automatically createdthe workflow manager to create actions on workflow events. If you want the behavior to work as expected, do not modify this out of the workflow manager."
+    enabled="True" event="Products.CMFCore.interfaces.IActionSucceededEvent"
+    stop-after="False">
+  <conditions>
+   <condition type="plone.conditions.WorkflowTransition">
+    <property name="wf_transitions">
+     <element>submit_to_finance</element>
+     <element>submit_to_hr</element>
+    </property>
+   </condition>
+  </conditions>
+  <actions>
+   <action type="plone.actions.MailRole">
+    <property name="source"/>
+    <property name="role">Personnel Manager</property>
+    <property name="global_roles">False</property>
+    <property name="acquired">True</property>
+    <property name="message">Hi,
+     
+     Your review is needed for a request at:
+     
+       ${url}
+     
+     Sincerely,
+     
+     DFM Human Resources</property>
+    <property name="subject">A request is ready for your review</property>
+   </action>
+  </actions>
+ </rule>
+ <rule name="rule-3" title="Time requests: creation notification "
+    description="A rule to send notifications after the time request has been moved into the proper location.
+
+Adding the action to the move rule doesn't work as it seems as it is executed with the acquisition context the object has when the rule triggers."
+    enabled="True" event="zope.lifecycleevent.interfaces.IObjectAddedEvent"
+    stop-after="False">
+  <conditions>
+   <condition type="plone.conditions.PortalType">
+    <property name="check_types">
+     <element>overtimepayout</element>
+     <element>overtimetime</element>
+     <element>timeoffrequest</element>
+    </property>
+   </condition>
+  </conditions>
+  <actions>
+   <action type="plone.actions.MailRole">
+    <property name="source"/>
+    <property name="role">Supervisor</property>
+    <property name="global_roles">False</property>
+    <property name="acquired">True</property>
+    <property name="message">Hi,
+     
+     A request is ready for review at:
+     
+       ${url}
+     
+     
+     Sincerely,
+     
+     DFM Human Resources</property>
+    <property name="subject">A request is ready for your review</property>
+   </action>
+  </actions>
+ </rule>
+ <assignment name="rule-2" bubbles="False" enabled="True"
+    location="/mip-vacation-time-off-form/vacation-time-off-request/requests"/>
+ <assignment name="rule-2" bubbles="False" enabled="True"
+    location="/mip-vacation-time-off-form/overtime-approval-or-payout-request/payouts"/>
+ <assignment name="rule-2" bubbles="False" enabled="True"
+    location="/mip-vacation-time-off-form/overtime-approval-or-payout-request/overtimes"/>
+ <assignment name="rule-1" bubbles="True" enabled="False" location=""/>
+ <assignment name="--workflowmanager--cancel" bubbles="True" enabled="True"
+    location=""/>
+ <assignment name="--workflowmanager--reject" bubbles="True" enabled="True"
+    location=""/>
+ <assignment name="--workflowmanager--retract" bubbles="True" enabled="True"
+    location=""/>
+ <assignment name="--workflowmanager--submit_to_supervisor" bubbles="True"
+    enabled="True" location=""/>
+ <assignment name="--workflowmanager--submit_to_hr" bubbles="True"
+    enabled="True" location=""/>
+ <assignment name="--workflowmanager--approve" bubbles="True" enabled="True"
+    location=""/>
+ <assignment name="rule-3" bubbles="True" enabled="True"
+    location="/mip-vacation-time-off-form/requests"/>
+</contentrules>

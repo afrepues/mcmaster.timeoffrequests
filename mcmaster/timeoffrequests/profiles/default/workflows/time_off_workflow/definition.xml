@@ -1,0 +1,226 @@
+<?xml version="1.0"?>
+<dc-workflow workflow_id="time_off_workflow" title="Time off workflow" description="Workflow for requests for time off." state_variable="review_state" initial_state="pending_supervisor" manager_bypass="False">
+ <permission>Access contents information</permission>
+ <permission>Modify portal content</permission>
+ <permission>View</permission>
+ <permission>Review portal content</permission>
+ <state state_id="approved" title="Approved">
+  <description>Request has been approved by the Supervisor and HR.</description>
+  <permission-map name="Access contents information" acquired="False">
+   <permission-role>Manager</permission-role>
+   <permission-role>Owner</permission-role>
+   <permission-role>Personnel Manager</permission-role>
+   <permission-role>Supervisor</permission-role>
+  </permission-map>
+  <permission-map name="Modify portal content" acquired="False">
+  </permission-map>
+  <permission-map name="Review portal content" acquired="False">
+  </permission-map>
+  <permission-map name="View" acquired="False">
+   <permission-role>Manager</permission-role>
+   <permission-role>Owner</permission-role>
+   <permission-role>Personnel Manager</permission-role>
+   <permission-role>Supervisor</permission-role>
+  </permission-map>
+  <group-map name="human-resources">
+   <group-role>Personnel Manager</group-role>
+  </group-map>
+ </state>
+ <state state_id="cancelled" title="Cancelled">
+  <description>This request has been cancelled.</description>
+  <permission-map name="Access contents information" acquired="False">
+   <permission-role>Manager</permission-role>
+   <permission-role>Owner</permission-role>
+   <permission-role>Personnel Manager</permission-role>
+   <permission-role>Supervisor</permission-role>
+  </permission-map>
+  <permission-map name="Modify portal content" acquired="False">
+  </permission-map>
+  <permission-map name="Review portal content" acquired="False">
+  </permission-map>
+  <permission-map name="View" acquired="False">
+   <permission-role>Manager</permission-role>
+   <permission-role>Owner</permission-role>
+   <permission-role>Personnel Manager</permission-role>
+   <permission-role>Supervisor</permission-role>
+  </permission-map>
+  <group-map name="human-resources">
+   <group-role>Personnel Manager</group-role>
+  </group-map>
+ </state>
+ <state state_id="draft" title="Draft">
+  <description>Being edited by the requester.
+
+Only the requester has access in this state.</description>
+  <exit-transition transition_id="cancel"/>
+  <exit-transition transition_id="submit_to_supervisor"/>
+  <permission-map name="Access contents information" acquired="False">
+   <permission-role>Manager</permission-role>
+   <permission-role>Owner</permission-role>
+   <permission-role>Personnel Manager</permission-role>
+   <permission-role>Supervisor</permission-role>
+  </permission-map>
+  <permission-map name="Modify portal content" acquired="False">
+   <permission-role>Owner</permission-role>
+  </permission-map>
+  <permission-map name="Review portal content" acquired="False">
+   <permission-role>Owner</permission-role>
+  </permission-map>
+  <permission-map name="View" acquired="False">
+   <permission-role>Manager</permission-role>
+   <permission-role>Owner</permission-role>
+   <permission-role>Personnel Manager</permission-role>
+   <permission-role>Supervisor</permission-role>
+  </permission-map>
+  <group-map name="human-resources">
+   <group-role>Personnel Manager</group-role>
+  </group-map>
+ </state>
+ <state state_id="pending_hr" title="Pending - HR">
+  <description>Awaiting reviewal by HR.</description>
+  <exit-transition transition_id="approve"/>
+  <exit-transition transition_id="cancel"/>
+  <exit-transition transition_id="reject"/>
+  <exit-transition transition_id="retract"/>
+  <permission-map name="Access contents information" acquired="False">
+   <permission-role>Manager</permission-role>
+   <permission-role>Owner</permission-role>
+   <permission-role>Personnel Manager</permission-role>
+   <permission-role>Supervisor</permission-role>
+  </permission-map>
+  <permission-map name="Modify portal content" acquired="False">
+  </permission-map>
+  <permission-map name="Review portal content" acquired="False">
+   <permission-role>Reviewer</permission-role>
+  </permission-map>
+  <permission-map name="View" acquired="False">
+   <permission-role>Manager</permission-role>
+   <permission-role>Owner</permission-role>
+   <permission-role>Personnel Manager</permission-role>
+   <permission-role>Supervisor</permission-role>
+  </permission-map>
+  <group-map name="human-resources">
+   <group-role>Personnel Manager</group-role>
+   <group-role>Reviewer</group-role>
+  </group-map>
+ </state>
+ <state state_id="pending_supervisor" title="Pending - supervisor">
+  <description>Waiting for the Supervisor to review.</description>
+  <exit-transition transition_id="cancel"/>
+  <exit-transition transition_id="reject"/>
+  <exit-transition transition_id="retract"/>
+  <exit-transition transition_id="submit_to_hr"/>
+  <permission-map name="Access contents information" acquired="False">
+   <permission-role>Manager</permission-role>
+   <permission-role>Owner</permission-role>
+   <permission-role>Personnel Manager</permission-role>
+   <permission-role>Supervisor</permission-role>
+  </permission-map>
+  <permission-map name="Modify portal content" acquired="False">
+  </permission-map>
+  <permission-map name="Review portal content" acquired="False">
+   <permission-role>Supervisor</permission-role>
+  </permission-map>
+  <permission-map name="View" acquired="False">
+   <permission-role>Manager</permission-role>
+   <permission-role>Owner</permission-role>
+   <permission-role>Personnel Manager</permission-role>
+   <permission-role>Supervisor</permission-role>
+  </permission-map>
+  <group-map name="human-resources">
+   <group-role>Personnel Manager</group-role>
+  </group-map>
+ </state>
+ <transition transition_id="approve" title="Approve" new_state="approved" trigger="USER" before_script="" after_script="">
+  <description>Approve this request for time off.</description>
+  <action url="%(content_url)s/content_status_modify?workflow_action=approve" category="workflow" icon="">Approve</action>
+  <guard>
+   <guard-permission>Review portal content</guard-permission>
+   <guard-role>Personnel Manager</guard-role>
+  </guard>
+ </transition>
+ <transition transition_id="cancel" title="Cancel" new_state="cancelled" trigger="USER" before_script="" after_script="">
+  <description>Cancel this request. A notification will be sent to those who have reviewed it so far.</description>
+  <action url="%(content_url)s/content_status_modify?workflow_action=cancel" category="workflow" icon="">Cancel</action>
+  <guard>
+   <guard-role>Owner</guard-role>
+  </guard>
+ </transition>
+ <transition transition_id="reject" title="Send back to requester" new_state="draft" trigger="USER" before_script="" after_script="">
+  <description>Will return the request to the original requester.
+
+You should include a reason for why it was rejected.</description>
+  <action url="%(content_url)s/content_status_modify?workflow_action=reject" category="workflow" icon="">Send back to requester</action>
+  <guard>
+   <guard-permission>Review portal content</guard-permission>
+  </guard>
+ </transition>
+ <transition transition_id="retract" title="Requester retracts submission" new_state="draft" trigger="USER" before_script="" after_script="">
+  <description>If you submitted the item by mistake or want to perform additional edits, this will take it back.</description>
+  <action url="%(content_url)s/content_status_modify?workflow_action=retract" category="workflow" icon="">Retract</action>
+  <guard>
+   <guard-role>Owner</guard-role>
+  </guard>
+ </transition>
+ <transition transition_id="submit_to_hr" title="Submit to HR" new_state="pending_hr" trigger="USER" before_script="" after_script="">
+  <description>Send to HR for review.</description>
+  <action url="%(content_url)s/content_status_modify?workflow_action=submit_to_hr" category="workflow" icon="">Submit to HR</action>
+  <guard>
+   <guard-permission>Review portal content</guard-permission>
+  </guard>
+ </transition>
+ <transition transition_id="submit_to_supervisor" title="Submit to Supervisor" new_state="pending_supervisor" trigger="USER" before_script="" after_script="">
+  <description>Submit to your Supervisor for review.</description>
+  <action url="%(content_url)s/content_status_modify?workflow_action=submit_to_supervisor" category="workflow" icon="">Submit to Supervisor</action>
+  <guard>
+   <guard-role>Owner</guard-role>
+  </guard>
+ </transition>
+ <variable variable_id="action" for_catalog="False" for_status="True" update_always="True">
+  <description>Previous transition</description>
+  <default>
+   
+   <expression>transition/getId|nothing</expression>
+  </default>
+  <guard>
+  </guard>
+ </variable>
+ <variable variable_id="actor" for_catalog="False" for_status="True" update_always="True">
+  <description>The ID of the user who performed the previous transition</description>
+  <default>
+   
+   <expression>user/getUserName</expression>
+  </default>
+  <guard>
+  </guard>
+ </variable>
+ <variable variable_id="comments" for_catalog="False" for_status="True" update_always="True">
+  <description>Comment about the last transition</description>
+  <default>
+   
+   <expression>python:state_change.kwargs.get('comment', '')</expression>
+  </default>
+  <guard>
+  </guard>
+ </variable>
+ <variable variable_id="review_history" for_catalog="False" for_status="False" update_always="False">
+  <description>Provides access to workflow history</description>
+  <default>
+   
+   <expression>state_change/getHistory</expression>
+  </default>
+  <guard>
+   <guard-permission>Request review</guard-permission>
+   <guard-permission>Review portal content</guard-permission>
+  </guard>
+ </variable>
+ <variable variable_id="time" for_catalog="False" for_status="True" update_always="True">
+  <description>When the previous transition was performed</description>
+  <default>
+   
+   <expression>state_change/getDateTime</expression>
+  </default>
+  <guard>
+  </guard>
+ </variable>
+</dc-workflow>
